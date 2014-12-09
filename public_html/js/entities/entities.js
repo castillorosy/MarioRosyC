@@ -18,7 +18,8 @@ game.PlayerEntity = me.Entity.extend({
        this.renderable.addAnimation("bigIdle", [19]);
         this.renderable.addAnimation("smallWalk", [8, 9, 10, 11, 12, 13], 80);
         this.renderable.addAnimation("bigWalk", [14,15,16,17,18,19], 80);
-        this.renderable.addAnimation("shrink");
+        this.renderable.addAnimation("shrink", [0, 1, 2, 3], 80);
+        this.renderable.addAnimation("grow", [4, 5, 6, 7], 80);
        
         this.renderable.setCurrentAnimation("idle");
         //sets the speed when we set the x axis (frist number) and y axis(second number)
@@ -42,11 +43,12 @@ game.PlayerEntity = me.Entity.extend({
         
         this.body.update(delta);
         me.collision.check(this, true, this.collideHandler.bind(this), true);
-        
+//        move it away from the bad guy
         if(!this.big){
             if (this.body.vel.x !== 0) {
-                if (!this.renderable.isCurrentAnimation("smallWalk"))
+                if (!this.renderable.isCurrentAnimation("smallWalk") && !this.renderable.isCurrentAnimation("grow") && !this.renderable.isCurrentAnimation("shrink"))
                     ;
+                //walking methods that help it shrink when it hits the mushroom
                 if (!this.renderable.isCurrentAnimation("smallWalk")) {
                     this.renderable.setCurrentAnimation("smallWalk");
                     this.renderable.setAnimationFrame();
@@ -57,11 +59,11 @@ game.PlayerEntity = me.Entity.extend({
             }
         }else{
              if (this.body.vel.x !== 0) {
-                if (!this.renderable.isCurrentAnimation("bigWalk"))
+                if (!this.renderable.isCurrentAnimation("bigWalk") && !this.renderable.isCurrentAnimation("grow") && !this.renderable.isCurrentAnimation("shrink"))
                     ;
                 if (!this.renderable.isCurrentAnimation("bigWalk")) {
                     this.renderable.setCurrentAnimation("bigWalk");
-                    this.renderable.setAnimationFrame();
+                    this.renderable.setAnimationFrame("shrink");
                 }
 
             } else {
@@ -83,13 +85,16 @@ game.PlayerEntity = me.Entity.extend({
             }else{
                 if(this.big){
                 this.big = false;
-                    this.body.vel.y -= this.accel.y * me.timer.tick;
+                    this.body.vel.y -= this.body.accel.y * me.timer.tick;
                 this.jumping = true;
+                this.renderable.setCurrentAnimation("shrink", "idle");
+                this.renderable.setCurrentAnimationframe();
                     me.state.change(me.state.MENU);
             }
             }
             
         }else if (response.b.type === 'mushroom'){
+            this.renderabble.setCurrentAnimation("grow", "bigIdle");
             this.big = true;
             me.game.world.removeChild(response.b);
         }
