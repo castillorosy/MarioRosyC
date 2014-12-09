@@ -83,7 +83,7 @@ game.PlayerEntity = me.Entity.extend({
             }else{
                 if(this.big){
                 this.big = false;
-                    this.vel.y -= this.accel.y * me.timer.tick;
+                    this.body.vel.y -= this.accel.y * me.timer.tick;
                 this.jumping = true;
                     me.state.change(me.state.MENU);
             }
